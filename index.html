@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNIVH2C</title>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Playfair Display', serif;
+            background: linear-gradient(135deg, #e0f7ff, #a7d8f5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+
+        #browser {
+            width: 90%;
+            max-width: 900px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        #toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background: #87ceeb;
+            color: #fff;
+        }
+
+        #logo {
+            display: flex;
+            align-items: center;
+        }
+
+        #logo img {
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        #logo h1 {
+            font-size: 1.8rem;
+            letter-spacing: 1px;
+        }
+
+        #search-bar {
+            flex: 1;
+            margin-left: 20px;
+        }
+
+        #search-bar input {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 20px;
+            font-size: 1rem;
+            outline: none;
+            background: #f7f7f7;
+        }
+
+        #results {
+            padding: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .result {
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #e0f7ff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .result:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .result h3 {
+            margin-bottom: 10px;
+            font-size: 1.4rem;
+            color: #007acc;
+        }
+
+        .result h3 a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .result p {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        /* Custom Scrollbar */
+        #results::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #results::-webkit-scrollbar-thumb {
+            background: #87ceeb;
+            border-radius: 4px;
+        }
+
+        #results::-webkit-scrollbar-thumb:hover {
+            background: #5bb5e0;
+        }
+
+        /* Import Playfair Display font */
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap');
+    </style>
+</head>
+<body>
+    <div id="browser">
+        <div id="toolbar">
+            <div id="logo">
+                <img src="Logo_UHIIC.png">
+                <h1>UNIVH2C</h1>
+            </div>
+            <div id="search-bar">
+                <input type="text" id="query" placeholder="Search for information...">
+            </div>
+        </div>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const queryInput = document.getElementById('query');
+        const resultsContainer = document.getElementById('results');
+
+        async function fetchResults(query) {
+            if (!query) return;
+            const response = await fetch('http://localhost:5000/search', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query })
+            });
+            const data = await response.json();
+            displayResults(data.hits.hits);
+        }
+
+        function truncateText(content, maxLength = 150) {
+            return content.length > maxLength
+                ? content.substring(0, maxLength) + '...'
+                : content;
+        }
+
+        function displayResults(results) {
+            resultsContainer.innerHTML = '';
+            results.forEach(res => {
+                const { title, content, id } = res._source;
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'result';
+                resultDiv.innerHTML = `
+                    <h3><a href="${id}" target="_blank">${title}</a></h3>
+                    <p>${truncateText(content)}</p>
+                `;
+                resultsContainer.appendChild(resultDiv);
+            });
+        }
+
+        queryInput.addEventListener('input', (e) => {
+            const query = e.target.value;
+            fetchResults(query);
+        });
+    </script>
+</body>
+</html>

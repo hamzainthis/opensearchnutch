@@ -1,0 +1,80 @@
+services:
+  opensearch-node1:
+    image: opensearchproject/opensearch:1.3.18
+    environment:
+      - discovery.type=zen
+      - cluster.name=my-cluster
+      - node.name=opensearch-node1
+      - discovery.seed_hosts=opensearch-node1,opensearch-node2 # Nodes to look for when discovering the cluster
+      - cluster.initial_master_nodes=opensearch-node1,opensearch-node2 # Nodes eligible to serve as master      - bootstrap.memory_lock=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "DISABLE_INSTALL_DEMO_CONFIG=false"
+      - "DISABLE_SECURITY_PLUGIN=false"
+      - "plugins.security.ssl.http.enabled=false"
+    volumes:
+      - opensearch_data1:/usr/share/opensearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    networks:
+      - nutch-network
+
+  opensearch-node2:
+    image: opensearchproject/opensearch:1.3.18
+    environment:
+      - discovery.type=zen
+      - cluster.name=my-cluster
+      - node.name=opensearch-node2
+      - discovery.seed_hosts=opensearch-node1
+      - discovery.seed_hosts=opensearch-node1,opensearch-node2 # Nodes to look for when discovering the cluster
+      - cluster.initial_master_nodes=opensearch-node1,opensearch-node2 # Nodes eligible to serve as master
+      - bootstrap.memory_lock=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "DISABLE_INSTALL_DEMO_CONFIG=false"
+      - "DISABLE_SECURITY_PLUGIN=false"
+      - "plugins.security.ssl.http.enabled=false"
+    volumes:
+      - opensearch_data2:/usr/share/opensearch/data
+    ports:
+      - "9201:9200"
+      - "9301:9300"
+    networks:
+      - nutch-network
+
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:1.3.18
+    ports:
+      - "5601:5601"
+    environment:
+      OPENSEARCH_HOSTS: '["http://opensearch-node1:9200","http://opensearch-node2:9200"]' 
+    networks:
+      - nutch-network
+    depends_on:
+      - opensearch-node1   
+      - opensearch-node2
+
+  nutch:
+    image: apache/nutch:latest 
+    container_name: nutch1 
+    environment: 
+      - JAVA_HOME=/usr/lib/jvm/java-11-openjdk 
+    working_dir: /root/
+    command: ["/bin/bash", "nutch-crawl.sh"] 
+    volumes:
+      - ./nutch/index-writers.xml:/root/nutch_source/runtime/local/conf/index-writers.xml 
+      - ./nutch/nutch-site.xml:/root/nutch_source/runtime/local/conf/nutch-site.xml 
+      - ./nutch/regex-urlfilter.txt:/root/nutch_source/runtime/local/conf/regex-urlfilter.txt 
+      - ./nutch/seed.txt:/root/nutch_source/runtime/local/urls/seed.txt 
+      - ./nutch/nutch-crawl.sh:/root/nutch-crawl.sh 
+    networks:
+      - nutch-network
+    depends_on:
+      - opensearch-dashboards
+
+volumes:
+  opensearch_data1:
+  opensearch_data2:
+
+networks:
+  nutch-network:
+    driver: bridge

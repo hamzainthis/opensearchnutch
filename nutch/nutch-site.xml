@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+<configuration>
+  <property>
+    <name>http.agent.name</name>
+    <value>MyNutchBot</value>
+  </property>
+  <property>
+    <name>db.max.fetch.delay</name>
+    <value>1000</value> <!-- Adjust delay for politeness -->
+  </property>
+  <property>
+    <name>plugin.includes</name>
+    <value>protocol-httpclient|urlfilter-regex|parse-(html|text|metatags|tika)|index-(basic|anchor|urlmeta|more|metadata)|indexer-opensearch-1x|nutch-extensionpoints</value>
+  </property>
+  <property>
+    <name>indexer.opensearch.host</name>
+    <value>https://opensearch:9200</value>
+  </property>
+  <property>
+    <name>indexer.opensearch.index</name>
+    <value>nutch</value>
+  </property>
+</configuration>

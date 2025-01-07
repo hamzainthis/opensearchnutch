@@ -1,0 +1,4 @@
++^https?:\/\/(www\.)?(flsh-uh2c\.ac\.ma|flbenmsik\.ma|flshm\.univh2c\.ma|ens\.univcasa\.ma|fdc\.ma|fsjesas\.univh2c\.ma|fsjesm\.ma|encgcasa\.ma|fsac\.univh2c\.ma|fsb\.univh2c\.ma|enset-media\.ac\.ma|fstm\.ac\.ma|est-uh2c\.ac\.ma|fmpc\.ac\.ma|fmd-uh2c\.ac\.ma|portal\.ensem\.ac\.ma|ensad\.ma|ensam-casa\.ma)(\/[^\s]*)?$
++^https://(www\.)?univh2c\.ma/
+-.*\.(php|js|png|ico|css)(\?.*)?$
+-.
